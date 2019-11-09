@@ -4,7 +4,7 @@
 // @version      0.0.1
 // @description  See top-rated comments in the issue
 // @author       0xC0FFEEC0DE
-// @include      https://github.com/*/*/issues
+// @include      /^https://github.com/(.*)/(.*)/issues/(.*)/
 // @license      MIT
 // ==/UserScript==
 
