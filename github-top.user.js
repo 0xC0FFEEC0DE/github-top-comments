@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         github-top
 // @namespace    github-top
-// @version      0.0.2
+// @version      0.0.3
 // @description  See top-rated comments in the issue
 // @homepageURL  https://github.com/0xC0FFEEC0DE/github-top-comments
 // @supportURL   https://github.com/0xC0FFEEC0DE/github-top-comments/issues
@@ -15,26 +15,28 @@
 ;(function() {
 'use strict'
 
+const TOP_LIMIT = 15
+
 ;(function main() {
     let ui = new UI()
     let actionPanel = document.querySelector('.gh-header-actions')
-
     let btn = document.createElement('button')
-    btn.className = 'btn btn-sm btn-info m-0 ml-0 ml-md-2'
+    btn.className = 'btn btn-sm btn-info ml-2 mr-2'
     btn.textContent = 'Show comment top'
     actionPanel.insertBefore(btn, actionPanel.firstChild)
 
     let data
-
     btn.onclick = () => {
         ui.drawTop()
         data = getData()
         //console.table(data)
         if(data.length === 0) {
             return ui.msg('no reactions')
+        } else {
+            ui.msg(`posts with reactions: ${data.length}`)
         }
-        data.forEach(d => ui.append(d))
-        ui.msg('')
+        data.slice(0, TOP_LIMIT)
+            .forEach(d => ui.append(d))
     }
 })()
 
@@ -85,8 +87,6 @@ UI.prototype.msg = function(m) {
     this.status.textContent = m
 }
 
-const TOP_LIMIT = 20
-
 function getData() {
     let posts = document.querySelectorAll('.comment')
     let postsWithReactions = Array.prototype.filter.call(posts, p => {
@@ -119,7 +119,6 @@ function getData() {
                     b = getLike(b)
                     return b.count - a.count
                 })
-                //.slice(0, TOP_LIMIT)
 
     return data
 }
