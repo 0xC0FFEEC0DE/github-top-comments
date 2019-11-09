@@ -1,8 +1,12 @@
 // ==UserScript==
 // @name         github-top
 // @namespace    github-top
-// @version      0.0.1
+// @version      0.0.2
 // @description  See top-rated comments in the issue
+// @homepageURL  https://github.com/0xC0FFEEC0DE/github-top-comments
+// @supportURL   https://github.com/0xC0FFEEC0DE/github-top-comments/issues
+// @downloadURL  https://raw.githubusercontent.com/0xC0FFEEC0DE/github-top-comments/master/github-top.user.js
+// @updateURL    https://raw.githubusercontent.com/0xC0FFEEC0DE/github-top-comments/master/github-top.user.js
 // @author       0xC0FFEEC0DE
 // @include      /^https://github.com/(.*)/(.*)/issues/(.*)/
 // @license      MIT
@@ -11,7 +15,32 @@
 ;(function() {
 'use strict'
 
-function UI() {
+;(function main() {
+    let ui = new UI()
+    let actionPanel = document.querySelector('.gh-header-actions')
+
+    let btn = document.createElement('button')
+    btn.className = 'btn btn-sm btn-info m-0 ml-0 ml-md-2'
+    btn.textContent = 'Show comment top'
+    actionPanel.insertBefore(btn, actionPanel.firstChild)
+
+    let data
+
+    btn.onclick = () => {
+        ui.drawTop()
+        data = getData()
+        //console.table(data)
+        if(data.length === 0) {
+            return ui.msg('no reactions')
+        }
+        data.forEach(d => ui.append(d))
+        ui.msg('')
+    }
+})()
+
+function UI() { }
+
+UI.prototype.drawTop = function() {
     let body = document.querySelector('body')
 
     let panel = document.createElement('div')
@@ -29,10 +58,14 @@ function UI() {
     this.top.style.margin = '5px'
     this.top.style['list-style-type'] = 'none'
     panel.appendChild(this.top)
+
+    this.status = document.createElement('span')
+    this.status.style.margin = '5px'
+    this.status.textContent = 'loading...'
+    panel.appendChild(this.status)
 }
 
 UI.prototype.append = function(post) {
-    console.log(post)
     let newLi = document.createElement('li')
 
     let permalink = document.createElement('a')
@@ -48,43 +81,47 @@ UI.prototype.append = function(post) {
     this.top.appendChild(newLi)
 }
 
+UI.prototype.msg = function(m) {
+    this.status.textContent = m
+}
+
 const TOP_LIMIT = 20
 
-let ui = new UI()
-
-let posts = document.querySelectorAll('.comment')
-let postsWithReactions = Array.prototype.filter.call(posts, p => {
-    return p.querySelector('.has-reactions')
-})
-
-let data = postsWithReactions.map(p => {
-    let post = {
-        link: p.querySelector('a.link-gray').href,
-        reactions: []
-    }
-
-    let reactionSection = p.querySelector('.comment-reactions-options')
-    post.reactions = Array.prototype.map.call(reactionSection.children, r => {
-        let [react, count] = r.innerText.split(' ')
-        count = Number.parseInt(count)
-        return {
-            react,
-            count
-        }
+function getData() {
+    let posts = document.querySelectorAll('.comment')
+    let postsWithReactions = Array.prototype.filter.call(posts, p => {
+        return p.querySelector('.has-reactions')
     })
-    return post
-})
 
-let getLike = d => d.reactions.find(r => r.react === '👍')
+    let data = postsWithReactions.map(p => {
+        let post = {
+            link: p.querySelector('a.link-gray').href,
+            reactions: []
+        }
 
-data = data.filter(d => getLike(d))
-            .sort((a,b) => {
-                a = getLike(a)
-                b = getLike(b)
-                return b.count - a.count
-            })
-            .slice(0, TOP_LIMIT)
+        let reactionSection = p.querySelector('.comment-reactions-options')
+        post.reactions = Array.prototype.map.call(reactionSection.children, r => {
+            let [react, count] = r.innerText.split(' ')
+            count = Number.parseInt(count)
+            return {
+                react,
+                count
+            }
+        })
+        return post
+    })
 
-data.forEach(d => ui.append(d))
+    let getLike = d => d.reactions.find(r => r.react === '👍')
 
+    data = data.filter(d => getLike(d))
+                .sort((a,b) => {
+                    a = getLike(a)
+                    b = getLike(b)
+                    return b.count - a.count
+                })
+                //.slice(0, TOP_LIMIT)
+
+    return data
+}
+            
 })();
