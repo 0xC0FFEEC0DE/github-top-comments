@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         github-top
 // @namespace    github-top
-// @version      0.0.3
+// @version      0.0.4
 // @description  See top-rated comments in the issue
 // @homepageURL  https://github.com/0xC0FFEEC0DE/github-top-comments
 // @supportURL   https://github.com/0xC0FFEEC0DE/github-top-comments/issues
@@ -12,7 +12,7 @@
 // @license      MIT
 // ==/UserScript==
 
-;(function() {
+(function() {
 'use strict'
 
 const TOP_LIMIT = 15
@@ -30,7 +30,7 @@ const TOP_LIMIT = 15
         ui.drawTop()
         data = getData()
         //console.table(data)
-        if(data.length === 0) {
+        if (data.length === 0) {
             return ui.msg('no reactions')
         } else {
             ui.msg(`posts with reactions: ${data.length}`)
@@ -61,10 +61,24 @@ UI.prototype.drawTop = function() {
     this.top.style['list-style-type'] = 'none'
     panel.appendChild(this.top)
 
+    let footer = document.createElement('div')
+    panel.appendChild(footer)
+
     this.status = document.createElement('span')
     this.status.style.margin = '5px'
     this.status.textContent = 'loading...'
-    panel.appendChild(this.status)
+    footer.appendChild(this.status)
+
+    let closeBtn = document.createElement('span')
+    closeBtn.textContent = '╳ close'
+    closeBtn.style.cursor = 'pointer'
+    closeBtn.style.display = 'block'
+    closeBtn.style['text-align'] = 'right'
+    footer.appendChild(closeBtn)
+
+    closeBtn.onclick = () => {
+        panel.parentNode.removeChild(panel)
+    }
 }
 
 UI.prototype.append = function(post) {
@@ -77,7 +91,7 @@ UI.prototype.append = function(post) {
     newLi.appendChild(permalink)
 
     let div = document.createElement('span')
-    post.reactions.forEach(r => div.textContent += ` ${r.react}${r.count} `)
+    post.reactions.forEach(r => (div.textContent += ` ${r.react}${r.count} `))
     newLi.appendChild(div)
 
     this.top.appendChild(newLi)
@@ -96,7 +110,7 @@ function getData() {
     let data = postsWithReactions.map(p => {
         let post = {
             link: p.querySelector('a.link-gray').href,
-            reactions: []
+            reactions: [],
         }
 
         let reactionSection = p.querySelector('.comment-reactions-options')
@@ -105,7 +119,7 @@ function getData() {
             count = Number.parseInt(count)
             return {
                 react,
-                count
+                count,
             }
         })
         return post
@@ -114,13 +128,13 @@ function getData() {
     let getLike = d => d.reactions.find(r => r.react === '👍')
 
     data = data.filter(d => getLike(d))
-                .sort((a,b) => {
-                    a = getLike(a)
-                    b = getLike(b)
-                    return b.count - a.count
-                })
+        .sort((a, b) => {
+            a = getLike(a)
+            b = getLike(b)
+            return b.count - a.count
+        })
 
     return data
 }
-            
-})();
+
+})()
