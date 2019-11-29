@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         github-top
 // @namespace    github-top
-// @version      0.0.4
+// @version      0.0.5
 // @description  See top-rated comments in the issue
 // @homepageURL  https://github.com/0xC0FFEEC0DE/github-top-comments
 // @supportURL   https://github.com/0xC0FFEEC0DE/github-top-comments/issues
@@ -19,11 +19,11 @@ const TOP_LIMIT = 15
 
 ;(function main() {
     let ui = new UI()
-    let actionPanel = document.querySelector('.gh-header-actions')
+    let header = document.querySelector('.sticky-content div')
     let btn = document.createElement('button')
     btn.className = 'btn btn-sm btn-info ml-2 mr-2'
     btn.textContent = 'Show comment top'
-    actionPanel.insertBefore(btn, actionPanel.firstChild)
+    header.appendChild(btn)
 
     let data
     btn.onclick = () => {
@@ -32,9 +32,8 @@ const TOP_LIMIT = 15
         //console.table(data)
         if (data.length === 0) {
             return ui.msg('no reactions')
-        } else {
-            ui.msg(`posts with reactions: ${data.length}`)
         }
+        ui.msg(`posts with reactions: ${data.length}`)
         data.slice(0, TOP_LIMIT)
             .forEach(d => ui.append(d))
     }
