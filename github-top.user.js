@@ -1,14 +1,14 @@
 // ==UserScript==
 // @name         github-top
 // @namespace    github-top
-// @version      0.0.5
+// @version      0.0.6
 // @description  See top-rated comments in the issue
 // @homepageURL  https://github.com/0xC0FFEEC0DE/github-top-comments
 // @supportURL   https://github.com/0xC0FFEEC0DE/github-top-comments/issues
 // @downloadURL  https://raw.githubusercontent.com/0xC0FFEEC0DE/github-top-comments/master/github-top.user.js
 // @updateURL    https://raw.githubusercontent.com/0xC0FFEEC0DE/github-top-comments/master/github-top.user.js
 // @author       0xC0FFEEC0DE
-// @include      /^https://github.com/(.*)/(.*)/issues/(.*)/
+// @include      /^https://github.com/(.*)/(.*)/(issues|pull)/(.*)/
 // @license      MIT
 // ==/UserScript==
 
